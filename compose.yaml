@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: backend/
+      dockerfile: Dockerfile.development
+    restart: unless-stopped
+    command: [ "tail", "-f", "/dev/null" ]
+    environment:
+      - SERVER_PORT=80
+      - SERVER_ADDR=127.0.0.1
+      - SURREALDB_HOST=db
+      - SURREALDB_PORT=8000
+      - SURREALDB_NAMESPACE=task
+      - SURREALDB_DBNAME=task
+      - SURREALDB_USERNAME=root
+      - SURREALDB_PASSWORD=root
+      - RUST_LOG=debug
+    volumes:
+      - ./backend:/code:z
+      - type: tmpfs
+        target: /code/target
+  # db:
+  #   image: surrealdb/surrealdb:v1.0.2
+  #   entrypoint: 
+  #     - /surreal
+  #     - start
+  #     - --user
+  #     - root
+  #     - --pass
+  #     - password
+  #     - --log trace

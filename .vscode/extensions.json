@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "tamasfe.even-better-toml",
+        "christian-kohler.path-intellisense",
+        "dustypomerleau.rust-syntax",
+        "wayou.vscode-todo-highlight",
+        "serayuzgur.crates"
+    ]
+}
