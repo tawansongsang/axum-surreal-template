@@ -48,7 +48,7 @@ fn hash(key: &[u8], to_hash: &ContentToHash) -> Result<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::auth_config;
+    use crate::config::auth_config;
     use anyhow::Result;
     use uuid::Uuid;
 

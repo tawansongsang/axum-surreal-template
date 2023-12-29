@@ -6,6 +6,7 @@ pub enum Error {
     PwdValidate,
     Salt,
     Hash,
+    SchemeNotFound(String),
 }
 
 // region:    --- Error Boilerplate

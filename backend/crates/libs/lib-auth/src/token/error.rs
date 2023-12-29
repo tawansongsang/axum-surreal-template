@@ -2,10 +2,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
+    HmacFailNewFromSlice,
+    
     InvalidFormat,
     CannotDecodeIdent,
     CannotDecodeExp,
-    HmacFailNewFromSlice,
     SignatureNotMatching,
     ExpNotIso,
     Expired,

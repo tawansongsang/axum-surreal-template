@@ -1,8 +1,17 @@
+use super::scheme;
+use derive_more::From;
+
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, From)]
 pub enum Error {
     FailSpawnBlockForHash,
+    PwdWithSchemeFailedParse,
+    FailSpawnBlockForValidate,
+
+    // -- Modules
+    #[from]
+    Scheme(scheme::Error),
 }
 
 // region:    --- Error Boilerplate
