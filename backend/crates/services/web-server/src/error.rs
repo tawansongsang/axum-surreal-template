@@ -1,23 +1,13 @@
-use super::store;
 use derive_more::From;
-use serde::Serialize;
-use serde_with::{serde_as, DisplayFromStr};
+use lib_surrealdb::model;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[serde_as]
-#[derive(Debug, Serialize, From)]
+#[derive(Debug, From)]
 pub enum Error {
-    DataNotFound,
-    CannotComparePasswordFromDB,
-
     // -- Modules
     #[from]
-    Store(store::Error),
-
-    // -- Externals
-    #[from]
-    Surrealdb(#[serde_as(as = "DisplayFromStr")] surrealdb::Error),
+    Model(model::Error),
 }
 
 // region:    --- Error Boilerplate

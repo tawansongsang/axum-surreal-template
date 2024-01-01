@@ -22,6 +22,9 @@ pub struct CoreConfig {
     pub DB_USERNAME: String,
     pub DB_PASSWORD: String,
     // pub AUTHGODTOKEN: String,
+
+    // -- Web
+    // pub WEB_FOLDER: String,
 }
 
 impl CoreConfig {
@@ -38,6 +41,8 @@ impl CoreConfig {
             DB_PASSWORD: get_env("SURREALDB_PASSWORD")?,
             // // -- AuthGodToken
             // AUTHGODTOKEN: get_env("AUTHGODTOKEN")?,
+            // -- Web
+            // WEB_FOLDER: get_env("WEB_FOLDER")?,
         })
     }
 }

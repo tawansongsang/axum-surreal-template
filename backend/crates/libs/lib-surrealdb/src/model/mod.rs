@@ -2,13 +2,13 @@ mod error;
 mod store;
 pub mod user_info;
 
-use self::store::{Db, new_db_pool};
+use self::store::{new_db_pool, Db};
 
-use self::error::Result;
+pub use self::error::{Error, Result};
 
-// #[derive(Clone)]
+#[derive(Clone)]
 pub struct ModelManager {
-    db: Db
+    db: Db,
 }
 
 impl ModelManager {
@@ -21,7 +21,8 @@ impl ModelManager {
 
     /// Return the surrealdb pool reference.
     /// (Only for the model layer)
-    pub(in crate::model) fn db(&self) -> &Db {
+    // pub(in crate::model) fn db(&self) -> &Db {
+    pub fn db(&self) -> &Db {
         &self.db
     }
 }

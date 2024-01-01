@@ -1,9 +1,11 @@
+use serde::Serialize;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Error {
     HmacFailNewFromSlice,
-    
+
     InvalidFormat,
     CannotDecodeIdent,
     CannotDecodeExp,
@@ -12,7 +14,7 @@ pub enum Error {
     Expired,
 
     // -- Modules
-    InvalidDuration(String)
+    InvalidDuration(String),
 }
 
 // region:    --- Error Boilerplate

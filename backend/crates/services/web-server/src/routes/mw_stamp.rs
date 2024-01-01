@@ -1,0 +1,54 @@
+use super::{Error, Result};
+use async_trait::async_trait;
+use axum::{
+    body::Body,
+    extract::FromRequestParts,
+    http::{request::Parts, Request},
+    middleware::Next,
+    response::Response,
+};
+use lib_utils::time::now_utc;
+use tower_cookies::cookie::time::OffsetDateTime;
+use tracing::debug;
+use uuid::Uuid;
+
+#[derive(Clone)]
+pub struct ReqStamp {
+    pub uuid: Uuid,
+    pub time_in: OffsetDateTime,
+}
+
+pub async fn mw_req_stamp(mut req: Request<Body>, next: Next) -> Result<Response> {
+    debug!("{:<12} - mw_req_stamp_resolver", "MIDDLEWARE");
+
+    let time_in = now_utc();
+    let uuid = Uuid::new_v4();
+
+    debug!(
+        "{:<12} - mw_req_stamp_resolver - {:?}",
+        "MODDLEWARE", time_in
+    );
+
+    req.extensions_mut().insert(ReqStamp { uuid, time_in });
+
+    Ok(next.run(req).await)
+}
+
+// region:    --- ReqStamp Extractor
+#[async_trait]
+impl<S: Send + Sync> FromRequestParts<S> for ReqStamp {
+    type Rejection = Error;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
+        debug!("{:<12} - ReqStamp", "EXTRACTOR");
+
+        let part = parts
+            .extensions
+            .get::<ReqStamp>()
+            .clone()
+            .ok_or(Error::ReqStampNotInResponseExt);
+
+        part.cloned()
+    }
+}
+// endregion: --- ReqStamp Extractor
