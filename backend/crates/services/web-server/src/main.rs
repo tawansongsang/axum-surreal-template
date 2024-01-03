@@ -11,8 +11,10 @@ use tracing::info;
 use tracing_subscriber::EnvFilter;
 
 use crate::routes::{
-    mw_auth::mw_ctx_resolve, mw_res_map::mw_response_map, mw_stamp::mw_req_stamp, routes_login,
-    routes_static, RpcState,
+    mw_auth::{mw_ctx_require, mw_ctx_resolve},
+    mw_res_map::mw_response_map,
+    mw_stamp::mw_req_stamp,
+    routes_login, routes_static, RpcState,
 };
 
 use error::Result;
@@ -31,12 +33,12 @@ async fn main() {
     info!("Starting Service ...");
 
     let rpc_state = RpcState { mm: mm.clone() };
-    // let routes_rpc = routes::routes_rpc::routes(rpc_state)
-    // .route_layer(middleware::from_fn(mw_ctx_require));
+    let routes_rpc =
+        routes::routes_rpc::routes(rpc_state).route_layer(middleware::from_fn(mw_ctx_require));
 
     let routes_all = Router::new()
         .merge(routes_login::routes(mm.clone()))
-        // .nest("/api", routes_rpc)
+        .nest("/api", routes_rpc)
         .layer(middleware::map_response(mw_response_map))
         .layer(middleware::from_fn_with_state(mm.clone(), mw_ctx_resolve))
         .layer(middleware::from_fn(mw_req_stamp))
