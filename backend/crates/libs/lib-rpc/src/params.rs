@@ -8,10 +8,12 @@
 //! `RpcRouter` (i.e., `rpc::router`) model.
 
 use crate::router::IntoParams;
+use crate::Result;
 
 use lib_surrealdb::sql::Thing;
 use serde::{de::DeserializeOwned, Deserialize};
-use serde_with::serde_as;
+use serde_json::Value;
+use serde_with::{serde_as, OneOrMany};
 
 /// Params structure for any RPC Create call.
 #[derive(Deserialize)]
@@ -21,7 +23,6 @@ pub struct ParamsForCreate<D> {
 
 impl<D> IntoParams for ParamsForCreate<D> where D: DeserializeOwned + Send {}
 
-// TODO: implement ParamsList
 /// Params structure for any RPC Update call.
 #[derive(Deserialize)]
 pub struct ParamsForUpdate<D> {
@@ -38,14 +39,45 @@ pub struct ParamsIded {
 }
 impl IntoParams for ParamsIded {}
 
-// /// Params structure for any RPC List call.
-// #[serde_as]
-// #[derive(Deserialize, Default)]
-// pub struct ParamsList<F>
-// where
-//     F: DeserializeOwned,
-// {
-//     #[serde_as(deserialize_as = "Option<OneOrMany<_>>")]
-//     pub filers: Option<Vec<F>>,
-//     pub list_options: Option<ListOptions>, // ListOptions from modql TODO: understand modql and implement with owned.
-// }
+/// Params structure for any RPC List call.
+#[serde_as]
+#[derive(Deserialize, Default)]
+pub struct ParamsList<F>
+where
+    F: DeserializeOwned,
+{
+    #[serde_as(deserialize_as = "Option<OneOrMany<_>>")]
+    pub filers: Option<Vec<F>>,
+    pub list_options: Option<ListOptions>, // ListOptions from modql TODO: understand modql and implement with owned.
+}
+
+#[derive(Deserialize)]
+pub struct ListOptions {
+    pub username: String,
+}
+
+/// Implements `IntoParams` for any type that also implements `IntoParams`.
+///
+/// Note: Application code might prefer to avoid this blanket implementation
+///       and opt for enabling it on a per-type basis instead. If that's the case,
+///       simply remove this general implementation and provide specific
+///       implementations for each type.
+impl<D> IntoParams for Option<D>
+where
+    D: DeserializeOwned + Send,
+    D: IntoParams,
+{
+    fn into_params(value: Option<Value>) -> Result<Self> {
+        let value = value.map(|v| serde_json::from_value(v)).transpose()?;
+        Ok(value)
+    }
+}
+
+/// This is the IntoParams implementation for serde_json Value.
+///
+/// Note: As above, this might not be a capability app code might want to
+///       allow for rpc_handlers, prefering to have everything strongly type.
+///       In this case, just remove this impelementation
+impl IntoParams for Value {}
+
+// endregion: --- General Implementations
