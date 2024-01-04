@@ -74,6 +74,7 @@ async fn inner_rpc_handler(ctx: Ctx, mm: ModelManager, rpc_req: RpcRequest) -> R
                 rpc_method: "create_task".to_string(),
             })?;
 
+            // 3.36 min
             let params = from_value(params).map_err(|_| Error::RpcFailJsonParams {
                 //ParamsForCreate<TaskParamsForCreate<'a>>
                 rpc_method: "create_task".to_string(),
