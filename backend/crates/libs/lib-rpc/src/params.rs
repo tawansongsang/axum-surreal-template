@@ -10,7 +10,6 @@
 use crate::router::IntoParams;
 use crate::Result;
 
-use lib_surrealdb::sql::Thing;
 use serde::{de::DeserializeOwned, Deserialize};
 use serde_json::Value;
 use serde_with::{serde_as, OneOrMany};
@@ -26,16 +25,16 @@ impl<D> IntoParams for ParamsForCreate<D> where D: DeserializeOwned + Send {}
 /// Params structure for any RPC Update call.
 #[derive(Deserialize)]
 pub struct ParamsForUpdate<D> {
-    pub id: Thing,
+    pub id: String,
     pub data: D,
 }
 
 impl<D> IntoParams for ParamsForUpdate<D> where D: DeserializeOwned + Send {}
 
-/// Params structure for any RPC Update call.
+/// Params structure for any RPC Get or Delete call.
 #[derive(Deserialize)]
 pub struct ParamsIded {
-    pub id: Thing,
+    pub id: String,
 }
 impl IntoParams for ParamsIded {}
 

@@ -1,4 +1,5 @@
 use derive_more::From;
+use lib_surrealdb::model;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 
@@ -9,6 +10,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     // -- RPC Router
     RpcIntoParamsMissing,
+
+    // -- Internal Modules
+    #[from]
+    Model(model::Error),
 
     // -- External Modules
     #[from]

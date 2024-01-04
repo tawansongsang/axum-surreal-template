@@ -30,6 +30,9 @@ pub enum Error {
     // -- ReqStamp
     ReqStampNotInResponseExt,
 
+    // -- Rpc
+    RpcMethodUnknow(String),
+
     // -- Module
     #[from]
     Model(model::Error),

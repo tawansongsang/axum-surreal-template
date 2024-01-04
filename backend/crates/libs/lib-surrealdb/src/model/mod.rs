@@ -1,5 +1,6 @@
 mod error;
 mod store;
+pub mod task;
 pub mod user_info;
 
 use self::store::{new_db_pool, Db};
@@ -22,6 +23,7 @@ impl ModelManager {
     /// Return the surrealdb pool reference.
     /// (Only for the model layer)
     // pub(in crate::model) fn db(&self) -> &Db {
+    // TODO: Change to use only in model module
     pub fn db(&self) -> &Db {
         &self.db
     }

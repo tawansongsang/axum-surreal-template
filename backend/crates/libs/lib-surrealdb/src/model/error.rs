@@ -8,8 +8,12 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[serde_as]
 #[derive(Debug, Serialize, From)]
 pub enum Error {
-    DataNotFound,
     CannotComparePasswordFromDB,
+    DataNotFound,
+    DataNotFoundFromCreated,
+    DataNotFoundFromDelete,
+    DataNotFoundFromUpdate,
+    UserIdNotFound,
 
     // -- Modules
     #[from]

@@ -25,8 +25,8 @@ impl Ctx {
         }
     }
 
-    pub fn user_id(&self) -> &Option<String> {
-        &self.user_id
+    pub fn user_id(&self) -> Option<&str> {
+        self.user_id.as_deref()
     }
 
     pub fn user_id_thing(&self) -> Option<Thing> {

@@ -16,10 +16,10 @@ impl UserInfoBmc {
         E: DeserializeOwned,
     {
         let db = mm.db();
-        let query = "SELECT * FROM user_info:$id LIMIT 1;";
-        let mut response = db.query(query).bind(("id", id.to_string())).await?;
+        let sql = "SELECT * FROM user_info:$id LIMIT 1;";
+        let mut result = db.query(sql).bind(("id", id.to_string())).await?;
 
-        let user_info: Option<E> = response.take(0)?;
+        let user_info: Option<E> = result.take(0)?;
 
         Ok(user_info)
     }
@@ -33,13 +33,13 @@ impl UserInfoBmc {
         E: DeserializeOwned,
     {
         let db = mm.db();
-        let query = "SELECT * FROM user_info WHERE username = $username LIMIT 1;";
-        let mut response = db
-            .query(query)
+        let sql = "SELECT * FROM user_info WHERE username = $username LIMIT 1;";
+        let mut result = db
+            .query(sql)
             .bind(("username", username.to_string()))
             .await?;
 
-        let user_info_for_auth: Option<E> = response.take(0)?;
+        let user_info_for_auth: Option<E> = result.take(0)?;
 
         Ok(user_info_for_auth)
     }
@@ -51,20 +51,21 @@ impl UserInfoBmc {
         password: &str,
     ) -> Result<()> {
         let db = mm.db();
-        let query =
+        let sql =
             "UPDATE ONLY user_info:&id SET password = &password update_by = user_info:&update_by update_on = time::now();";
-        let mut response = db
-            .query(query)
+        let mut result = db
+            .query(sql)
             .bind(("id", id))
             .bind(("password", password))
             .bind(("update_by", ctx.user_id()))
             .await?;
 
-        let _user_info: Option<UserInfo> = response.take(0)?;
+        let _user_info: Option<UserInfo> = result.take(0)?;
 
         Ok(())
     }
 
+    // TODO: Change return UserInfo to id only
     pub async fn create(
         ctx: &Ctx,
         mm: &ModelManager,
@@ -91,15 +92,15 @@ impl UserInfoBmc {
     pub async fn validate_password(mm: &ModelManager, hash: &str, password: &str) -> Result<bool> {
         let db = mm.db();
 
-        let query = "RETURN crypto::argon2::compare($hash, $pass)";
+        let sql = "RETURN crypto::argon2::compare($hash, $pass)";
 
-        let mut response = db
-            .query(query)
+        let mut result = db
+            .query(sql)
             .bind(("hash", hash))
             .bind(("pass", password))
             .await?;
 
-        response
+        result
             .take::<Option<bool>>(0)?
             .ok_or(Error::CannotComparePasswordFromDB)
     }
