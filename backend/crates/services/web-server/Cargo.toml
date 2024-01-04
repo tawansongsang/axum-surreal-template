@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 lib-auth = { version = "0.1.0", path = "../../libs/lib-auth" }
+lib-rpc = { version = "0.1.0", path = "../../libs/lib-rpc" }
 lib-surrealdb = { version = "0.1.0", path = "../../libs/lib-surrealdb" }
 lib-utils = { version = "0.1.0", path = "../../libs/lib-utils" }
 axum = "0.7.3"

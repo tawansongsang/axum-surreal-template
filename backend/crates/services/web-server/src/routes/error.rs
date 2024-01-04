@@ -32,12 +32,24 @@ pub enum Error {
 
     // -- Rpc
     RpcMethodUnknow(String),
+    RpcMissingParams {
+        rpc_method: String,
+    },
+    RpcFailJsonParams {
+        rpc_method: String,
+    },
 
     // -- Module
     #[from]
     Model(model::Error),
     #[from]
     Token(token::Error),
+    #[from]
+    Rpc(lib_rpc::Error),
+
+    // -- Externals
+    #[from]
+    SerdeJson(#[serde_as(as = "DisplayFromStr")] serde_json::Error),
 }
 
 // region:    --- Axum IntoResponse
