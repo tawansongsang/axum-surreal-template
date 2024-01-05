@@ -37,7 +37,8 @@ async fn api_login_handler(
     let user: UserInfoForLogin = UserInfoBmc::first_by_username(&root_ctx, &mm, &username)
         .await?
         .ok_or(Error::LoginFailUsernameNotFound)?;
-    let user_id = user.id.to_raw();
+
+    let user_id = user.id.id.to_raw();
 
     // -- Validate the password.
     let Some(hash) = user.password else {

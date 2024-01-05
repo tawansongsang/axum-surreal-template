@@ -87,6 +87,19 @@ impl Error {
             LoginFailUsernameNotFound
             | LoginFailUserHasNoPwd { .. }
             | LoginFailPwdNotMatching { .. } => (StatusCode::FORBIDDEN, ClientError::LOGIN_FAIL),
+
+            // -- Auth
+            CtxExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
+
+            // -- Model TODO: implement for better client response.
+            Model(_) => (StatusCode::BAD_REQUEST, ClientError::ENTITY_NOT_FOUND),
+
+            // -- Rpc TODO: implement for better client response.
+            RpcMissingParams { .. } | RpcFailJsonParams { .. } | RpcMethodUnknow(_) => {
+                (StatusCode::BAD_REQUEST, ClientError::ENTITY_NOT_FOUND)
+            }
+
+            // -- Fallback,
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ClientError::SERVICE_ERROR,

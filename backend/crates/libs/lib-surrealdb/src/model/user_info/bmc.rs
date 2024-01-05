@@ -1,5 +1,5 @@
 use serde::de::DeserializeOwned;
-use surrealdb::sql::{self};
+use surrealdb::sql::{self, Thing};
 
 use crate::{
     ctx::Ctx,
@@ -40,6 +40,16 @@ impl UserInfoBmc {
             .await?;
 
         let user_info_for_auth: Option<E> = result.take(0)?;
+
+        Ok(user_info_for_auth)
+    }
+
+    pub async fn first_by_id<'de, E>(_ctx: &Ctx, mm: &ModelManager, id: &str) -> Result<Option<E>>
+    where
+        E: DeserializeOwned,
+    {
+        let db = mm.db();
+        let user_info_for_auth = db.select(("user_info", id)).await?;
 
         Ok(user_info_for_auth)
     }

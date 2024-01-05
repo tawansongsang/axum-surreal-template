@@ -21,8 +21,8 @@ pub struct Task<'a> {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct TaskParamsForCreate<'a> {
-    pub title: &'a str,
+pub struct TaskParamsForCreate {
+    pub title: String,
     // pub project_id: Thing,
 }
 
@@ -35,19 +35,19 @@ pub struct TaskForCreate<'a> {
 }
 
 #[derive(Deserialize, Default)]
-pub struct TaskParamsForUpdate<'a> {
-    pub title: Option<&'a str>,
+pub struct TaskParamsForUpdate {
+    pub title: Option<String>,
     pub done: Option<bool>,
 }
 
-#[derive(Serialize)]
-pub struct TaskForUpdate<'a> {
-    pub title: Option<&'a str>,
-    pub done: Option<bool>,
-    pub update_by: &'a Thing,
-}
+// #[derive(Serialize)]
+// pub struct TaskForUpdate<'a> {
+//     pub title: Option<&'a str>,
+//     pub done: Option<bool>,
+//     pub update_by: &'a Thing,
+// }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct TaskRecord {
     pub id: Thing,
 }

@@ -30,8 +30,7 @@ impl Ctx {
     }
 
     pub fn user_id_thing(&self) -> Option<Thing> {
-        self.user_id
-            .clone()
+        self.user_id()
             .and_then(|id_str| Thing::from_str(&id_str).ok())
     }
 }

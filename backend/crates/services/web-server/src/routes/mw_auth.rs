@@ -35,7 +35,7 @@ pub async fn mw_ctx_resolve(
     mut req: Request<Body>,
     next: Next,
 ) -> Result<Response> {
-    debug!("{:<12} - mew_ctx_resolve", "MIDDLEWARE");
+    debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
     let ctx_ext_result = inner_ctx_resolve(mm, &cookies).await;
 
@@ -64,17 +64,18 @@ async fn inner_ctx_resolve(mm: State<ModelManager>, cookies: &Cookies) -> CtxExt
     let token: Token = token.parse().map_err(|_| CtxExtError::TokenWrongFormat)?;
 
     // -- Get UserInfoForAuth
-    let user =
-        UserInfoBmc::first_by_username::<UserInfoForAuth>(&Ctx::root_ctx(), &mm, &token.ident)
-            .await
-            .map_err(|ex| CtxExtError::ModelAccessError(ex.to_string()))?
-            .ok_or(CtxExtError::UserNotFound)?;
+    let user = UserInfoBmc::first_by_id::<UserInfoForAuth>(&Ctx::root_ctx(), &mm, &token.ident)
+        .await
+        .map_err(|ex| CtxExtError::ModelAccessError(ex.to_string()))?;
+
+    let user = user.ok_or(CtxExtError::UserNotFound)?;
 
     // -- Validate Token
     validate_web_token(&token, user.token_salt).map_err(|_| CtxExtError::FailValidate)?;
 
     // -- Update Token
-    set_token_cookie(cookies, &user.id.to_raw(), user.token_salt)
+    let user_id = &user.id.id.to_raw();
+    set_token_cookie(cookies, user_id, user.token_salt)
         .map_err(|_| CtxExtError::CannotSetTokenCookie)?;
 
     // -- Create CtxExtResult

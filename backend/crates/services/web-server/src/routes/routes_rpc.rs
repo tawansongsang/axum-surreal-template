@@ -5,11 +5,8 @@ use axum::{
     routing::post,
     Json, Router,
 };
-use lib_rpc::rpcs::task_rpc::{create_task, list_tasks};
-use lib_surrealdb::{
-    ctx::Ctx,
-    model::{task::TaskParamsForCreate, ModelManager},
-};
+use lib_rpc::rpcs::task_rpc::{create_task, delete_task, list_tasks, update_task};
+use lib_surrealdb::{ctx::Ctx, model::ModelManager};
 use serde::Deserialize;
 use serde_json::{from_value, json, to_value, Value};
 use tracing::debug;
@@ -55,6 +52,26 @@ async fn rpc_handler(
         .into_response()
 }
 
+macro_rules! exec_rpc_fn {
+    // -- With Params
+    ($rpc_fn:expr, $ctx:expr, $mm:expr, $rpc_params:expr) => {{
+        let rpc_fn_name = stringify!($rpc_fn);
+        let params = $rpc_params.ok_or(Error::RpcMissingParams {
+            rpc_method: rpc_fn_name.to_string(),
+        })?;
+
+        let params = from_value(params).map_err(|_| Error::RpcFailJsonParams {
+            rpc_method: rpc_fn_name.to_string(),
+        })?;
+        $rpc_fn($ctx, $mm, params).await.map(to_value)??
+    }};
+
+    // -- Without Params
+    ($rpc_fn:expr, $ctx:expr, $mm:expr) => {
+        $rpc_fn($ctx, $mm).await.map(to_value)??
+    };
+}
+
 async fn inner_rpc_handler(ctx: Ctx, mm: ModelManager, rpc_req: RpcRequest) -> Result<Json<Value>> {
     let RpcRequest {
         id: rpc_id,
@@ -69,22 +86,11 @@ async fn inner_rpc_handler(ctx: Ctx, mm: ModelManager, rpc_req: RpcRequest) -> R
 
     let result_json = match rpc_method.as_str() {
         // -- Task RPC methods.
-        "create_task" => {
-            let params = rpc_params.ok_or(Error::RpcMissingParams {
-                rpc_method: "create_task".to_string(),
-            })?;
-
-            // 3.36 min
-            let params = from_value(params).map_err(|_| Error::RpcFailJsonParams {
-                //ParamsForCreate<TaskParamsForCreate<'a>>
-                rpc_method: "create_task".to_string(),
-            })?;
-
-            create_task(ctx, mm, params).await.map(to_value)??
-        }
-        "list_tasks" => list_tasks(ctx, mm).await.map(to_value)??,
-        "update_task" => todo!(),
-        "delete_task" => todo!(),
+        "create_task" => exec_rpc_fn!(create_task, ctx, mm, rpc_params),
+        "list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
+        // TODO: Continue viedo on 3.40
+        "update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
+        "delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
 
         // -- Fallback as Err.
         _ => return Err(Error::RpcMethodUnknow(rpc_method)),
