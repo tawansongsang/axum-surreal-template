@@ -7,8 +7,8 @@ use serde_json::{json, Value};
 use serde_with::skip_serializing_none;
 use tracing::debug;
 
-use crate::routes::ClientError;
-use crate::routes::{self, mw_stamp::ReqStamp, routes_rpc::RpcInfo};
+use crate::web::ClientError;
+use crate::web::{self, mw_stamp::ReqStamp, routes_rpc::RpcInfo};
 use crate::Result;
 
 pub async fn log_request(
@@ -17,7 +17,7 @@ pub async fn log_request(
     req_stamp: ReqStamp,
     rpc_info: Option<&RpcInfo>,
     ctx: Option<Ctx>,
-    web_error: Option<&routes::Error>,
+    web_error: Option<&web::Error>,
     client_error: Option<ClientError>,
 ) -> Result<()> {
     // -- Prep Error

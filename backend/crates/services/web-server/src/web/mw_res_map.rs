@@ -10,7 +10,7 @@ use tracing::debug;
 
 use crate::{
     log::log_request,
-    routes::{self, routes_rpc::RpcInfo},
+    web::{self, routes_rpc::RpcInfo},
 };
 
 use super::{mw_auth::CtxW, mw_stamp::ReqStamp};
@@ -30,10 +30,7 @@ pub async fn mw_response_map(
     let rpc_info = res.extensions().get::<Arc<RpcInfo>>().map(Arc::as_ref);
 
     // -- Get the eventual response error.
-    let web_error = res
-        .extensions()
-        .get::<Arc<routes::Error>>()
-        .map(Arc::as_ref);
+    let web_error = res.extensions().get::<Arc<web::Error>>().map(Arc::as_ref);
     let client_status_error = web_error.map(|se| se.client_status_and_error());
 
     // -- If client error, build the new response.

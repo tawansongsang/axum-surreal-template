@@ -88,7 +88,6 @@ async fn inner_rpc_handler(ctx: Ctx, mm: ModelManager, rpc_req: RpcRequest) -> R
         // -- Task RPC methods.
         "create_task" => exec_rpc_fn!(create_task, ctx, mm, rpc_params),
         "list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
-        // TODO: Continue viedo on 3.40
         "update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
         "delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
 

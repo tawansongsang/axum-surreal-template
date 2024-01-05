@@ -1,7 +1,7 @@
 mod config;
 mod error;
 mod log;
-mod routes;
+mod web;
 
 use axum::{middleware, Router};
 use lib_surrealdb::model::ModelManager;
@@ -10,7 +10,7 @@ use tower_cookies::CookieManagerLayer;
 use tracing::info;
 use tracing_subscriber::EnvFilter;
 
-use crate::routes::{
+use crate::web::{
     mw_auth::{mw_ctx_require, mw_ctx_resolve},
     mw_res_map::mw_response_map,
     mw_stamp::mw_req_stamp,
@@ -34,7 +34,7 @@ async fn main() {
 
     let rpc_state = RpcState { mm: mm.clone() };
     let routes_rpc =
-        routes::routes_rpc::routes(rpc_state).route_layer(middleware::from_fn(mw_ctx_require));
+        web::routes_rpc::routes(rpc_state).route_layer(middleware::from_fn(mw_ctx_require));
 
     let routes_all = Router::new()
         .merge(routes_login::routes(mm.clone()))

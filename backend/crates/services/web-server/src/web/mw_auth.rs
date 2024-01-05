@@ -10,7 +10,7 @@ use lib_surrealdb::{
 use serde::Serialize;
 
 use super::error::{Error, Result};
-use crate::routes::{set_token_cookie, AUTH_TOKEN};
+use crate::web::{set_token_cookie, AUTH_TOKEN};
 use axum::{
     body::Body,
     extract::{FromRequestParts, Request, State},

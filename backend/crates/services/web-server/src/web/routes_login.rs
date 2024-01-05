@@ -1,4 +1,4 @@
-use crate::routes::{self, remove_token_cookie};
+use crate::web::{self, remove_token_cookie};
 
 use super::error::{Error, Result};
 
@@ -52,7 +52,7 @@ async fn api_login_handler(
     }
 
     // -- Set web token
-    routes::set_token_cookie(&cookies, &user_id, user.token_salt)?;
+    web::set_token_cookie(&cookies, &user_id, user.token_salt)?;
 
     // -- Create the success body
     let body = Json(json!({

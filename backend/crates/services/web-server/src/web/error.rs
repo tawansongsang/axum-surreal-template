@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::routes;
+use crate::web;
 use axum::{http::StatusCode, response::IntoResponse};
 use derive_more::From;
 use lib_auth::token;
@@ -25,7 +25,7 @@ pub enum Error {
     },
     // -- CtxExtError
     #[from]
-    CtxExt(routes::mw_auth::CtxExtError),
+    CtxExt(web::mw_auth::CtxExtError),
 
     // -- ReqStamp
     ReqStampNotInResponseExt,
@@ -80,7 +80,7 @@ impl std::error::Error for Error {}
 
 impl Error {
     pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
-        use routes::Error::*;
+        use web::Error::*;
 
         let response = match self {
             // -- Login
@@ -96,7 +96,7 @@ impl Error {
 
             // -- Rpc TODO: implement for better client response.
             RpcMissingParams { .. } | RpcFailJsonParams { .. } | RpcMethodUnknow(_) => {
-                (StatusCode::BAD_REQUEST, ClientError::ENTITY_NOT_FOUND)
+                (StatusCode::BAD_REQUEST, ClientError::BAD_REQUEST)
             }
 
             // -- Fallback,
@@ -119,6 +119,7 @@ pub enum ClientError {
     NO_AUTH,
     // ENTITY_NOT_FOUND { entity: &'static str, id: i64 },
     ENTITY_NOT_FOUND,
+    BAD_REQUEST,
 
     SERVICE_ERROR,
 }
