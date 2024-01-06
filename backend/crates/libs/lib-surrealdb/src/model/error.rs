@@ -8,6 +8,15 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[serde_as]
 #[derive(Debug, Serialize, From)]
 pub enum Error {
+    EntityNotFound {
+        entity: &'static str,
+        id: i64,
+    },
+    ListLimitOverMax {
+        max: i64,
+        actual: i64,
+    },
+
     CannotComparePasswordFromDB,
     DataNotFound,
     DataNotFoundFromCreated,
@@ -16,6 +25,8 @@ pub enum Error {
     UserIdNotFound,
 
     // -- Modules
+    // #[from]
+    // Pwd(pwd::Error),
     #[from]
     Store(store::Error),
 

@@ -1,9 +1,10 @@
 use super::scheme;
 use derive_more::From;
+use serde::Serialize;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, From)]
+#[derive(Debug, Serialize, From)]
 pub enum Error {
     FailSpawnBlockForHash,
     PwdWithSchemeFailedParse,

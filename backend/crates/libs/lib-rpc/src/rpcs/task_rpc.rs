@@ -9,11 +9,17 @@ use lib_surrealdb::{
 use crate::{
     params::{ParamsForCreate, ParamsForUpdate, ParamsIded},
     router::RpcRouter,
-    Result,
+    rpc_router, Result,
 };
 
 pub fn rpc_router() -> RpcRouter {
-    todo!()
+    rpc_router!(
+        // Same as RpcRouter::new().add..
+        create_task,
+        list_tasks,
+        update_task,
+        delete_task,
+    )
 }
 
 pub async fn create_task<'a>(
@@ -30,6 +36,7 @@ pub async fn create_task<'a>(
 }
 
 pub async fn list_tasks<'a>(ctx: Ctx, mm: ModelManager) -> Result<Vec<Task<'a>>> {
+    // TODO: create TaskFilter
     // let tasks = TaskBmc::list(&ctx, &mm, filter, limit)?;
     let tasks = TaskBmc::list(&ctx, &mm).await?;
 

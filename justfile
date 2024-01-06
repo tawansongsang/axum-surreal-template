@@ -2,9 +2,13 @@ alias bb := backend_build
 alias br := backend_run
 alias bt := backend_test
 alias bd := backend_dev
+alias bc := backend_check
 
 backend_build:
   cargo build --manifest-path backend/Cargo.toml --config backend/.cargo/config.toml
+
+backend_check:
+  cargo check --manifest-path backend/Cargo.toml --config backend/.cargo/config.toml
 
 backend_run:
   cargo run --manifest-path backend/Cargo.toml --config backend/.cargo/config.toml

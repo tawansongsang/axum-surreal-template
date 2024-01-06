@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Error {
     Key,
     PwdValidate,

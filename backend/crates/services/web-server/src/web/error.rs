@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::web;
 use axum::{http::StatusCode, response::IntoResponse};
 use derive_more::From;
-use lib_auth::token;
+use lib_auth::{pwd, token};
 use lib_surrealdb::model;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
@@ -42,6 +42,8 @@ pub enum Error {
     // -- Module
     #[from]
     Model(model::Error),
+    #[from]
+    Pwd(pwd::Error),
     #[from]
     Token(token::Error),
     #[from]
@@ -92,12 +94,15 @@ impl Error {
             CtxExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
             // -- Model TODO: implement for better client response.
-            Model(_) => (StatusCode::BAD_REQUEST, ClientError::ENTITY_NOT_FOUND),
+            Model(model::Error::EntityNotFound { entity, id }) => (
+                StatusCode::BAD_REQUEST,
+                ClientError::ENTITY_NOT_FOUND { entity, id: *id },
+            ),
 
-            // -- Rpc TODO: implement for better client response.
-            RpcMissingParams { .. } | RpcFailJsonParams { .. } | RpcMethodUnknow(_) => {
-                (StatusCode::BAD_REQUEST, ClientError::BAD_REQUEST)
-            }
+            // // -- Rpc TODO: implement for better client response.
+            // RpcMissingParams { .. } | RpcFailJsonParams { .. } | RpcMethodUnknow(_) => {
+            //     (StatusCode::BAD_REQUEST, ClientError::BAD_REQUEST)
+            // }
 
             // -- Fallback,
             _ => (
@@ -117,10 +122,8 @@ impl Error {
 pub enum ClientError {
     LOGIN_FAIL,
     NO_AUTH,
-    // ENTITY_NOT_FOUND { entity: &'static str, id: i64 },
-    ENTITY_NOT_FOUND,
-    BAD_REQUEST,
-
+    ENTITY_NOT_FOUND { entity: &'static str, id: i64 },
+    // ENTITY_NOT_FOUND,
     SERVICE_ERROR,
 }
 // endregion: --- Client Error
