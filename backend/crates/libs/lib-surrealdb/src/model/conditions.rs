@@ -70,6 +70,9 @@ where
 {
     let filter = match filters {
         Some(filters) => {
+            if filters.is_empty() {
+                return String::new();
+            }
             let filter = filters
                 .iter()
                 .map(|filter| filter.gen_condition().join(" AND "))
