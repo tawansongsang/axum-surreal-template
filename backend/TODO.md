@@ -1,2 +1,2 @@
 # TODO List
-- [ ] refectoring route_rpc with lib/lib-rpc for scaling code
+- [x] refectoring route_rpc with lib/lib-rpc for scaling code

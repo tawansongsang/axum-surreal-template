@@ -1,7 +1,13 @@
 use std::borrow::Cow;
 
+use crate::model::conditions::{
+    create_eq_con, create_str_contain_con, create_time_le_con, create_time_me_con,
+};
+
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::{Datetime, Thing};
+
+use super::Filter;
 
 pub mod bmc;
 
@@ -40,28 +46,40 @@ pub struct TaskParamsForUpdate {
     pub done: Option<bool>,
 }
 
-// #[derive(Serialize)]
-// pub struct TaskForUpdate<'a> {
-//     pub title: Option<&'a str>,
-//     pub done: Option<bool>,
-//     pub update_by: &'a Thing,
-// }
-
 #[derive(Debug, Deserialize)]
 pub struct TaskRecord {
     pub id: Thing,
 }
 
+#[derive(Debug, Deserialize, Default)]
 pub struct TaskFilter {
-    pub id: Option<Thing>,
-    // project_id: Option<Thing>,
+    pub id: Option<String>, //Option<Thing>
+    // project_id: Option<String>, //Option<Thing>
     pub title: Option<String>,
     pub done: Option<bool>,
 
-    pub create_by: Option<Thing>,
+    pub create_by: Option<String>, //Option<Thing>
     pub start_create_on: Option<Datetime>,
     pub end_create_on: Option<Datetime>,
-    pub update_by: Option<Thing>,
+    pub update_by: Option<String>, //Option<Thing>
     pub start_update_on: Option<Datetime>,
     pub end_update_on: Option<Datetime>,
+}
+
+impl Filter for TaskFilter {
+    fn gen_condition(&self) -> Vec<String> {
+        let mut conditions = Vec::new();
+
+        create_eq_con!(self, conditions, id, id);
+        create_str_contain_con!(self, conditions, title, title);
+        create_eq_con!(self, conditions, done, done);
+        create_eq_con!(self, conditions, create_by, create_by);
+        create_time_me_con!(self, conditions, create_on, start_create_on);
+        create_time_le_con!(self, conditions, create_on, end_create_on);
+        create_eq_con!(self, conditions, update_by, update_by);
+        create_time_me_con!(self, conditions, update_on, start_update_on);
+        create_time_le_con!(self, conditions, update_on, end_update_on);
+
+        conditions
+    }
 }

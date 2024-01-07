@@ -18,6 +18,8 @@ pub enum Error {
     },
 
     CannotComparePasswordFromDB,
+    CannotParseStrToDatetime(String),
+    CannotParseStrToThing(String),
     DataNotFound,
     DataNotFoundFromCreated,
     DataNotFoundFromDelete,

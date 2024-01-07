@@ -1,12 +1,12 @@
 use serde::de::DeserializeOwned;
-use surrealdb::sql::{self, Thing};
+use surrealdb::sql;
 
 use crate::{
     ctx::Ctx,
     model::{Error, ModelManager, Result},
 };
 
-use super::{UserInfo, UserInfoCreated, UserInfoForCreate};
+use super::{UserInfo, UserInfoCreated, UserInfoForCreate, UserInfoRecord};
 
 pub struct UserInfoBmc;
 
@@ -75,12 +75,11 @@ impl UserInfoBmc {
         Ok(())
     }
 
-    // TODO: Change return UserInfo to id only
     pub async fn create(
         ctx: &Ctx,
         mm: &ModelManager,
         user_info_for_create: UserInfoForCreate,
-    ) -> Result<UserInfo> {
+    ) -> Result<UserInfoRecord> {
         let db = mm.db();
 
         let user_id_create = ctx.user_id_thing();
@@ -92,7 +91,8 @@ impl UserInfoBmc {
             update_by: &user_id_create,
         };
 
-        let mut created: Vec<UserInfo> = db.create("user_info").content(user_info_created).await?;
+        let mut created: Vec<UserInfoRecord> =
+            db.create("user_info").content(user_info_created).await?;
 
         let user_info = created.pop().ok_or(Error::DataNotFound)?;
 
@@ -116,29 +116,33 @@ impl UserInfoBmc {
     }
 }
 
-// TODO: Create Unit Test
+// region:    --- Tests
+#[cfg(test)]
+mod tests {
+    pub type Result<T> = core::result::Result<T, Error>;
+    pub type Error = Box<dyn std::error::Error>; // For tests.
+    use crate::model::{self, user_info::UserInfoForAuth};
 
-// // region:    --- Tests
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use anyhow::Result;
+    use super::*;
+    use serial_test::serial;
 
-//     fn test_first_ok_demo1() -> Result<()> {
-// 		// -- Setup & Fixtures
-// 		let mm = _dev_utils::init_test().await;
-// 		let ctx = Ctx::root_ctx();
-// 		let fx_username = "demo1";
+    #[serial]
+    #[tokio::test]
+    async fn test_first_ok_demo1() -> Result<()> {
+        // -- Setup & Fixtures
+        let mm = model::ModelManager::new().await?;
+        let ctx = Ctx::root_ctx();
+        let fx_username = "demo1";
 
-// 		// -- Exec
-// 		let user: UserInfo = UserBmc::first_by_username(&ctx, &mm, fx_username)
-// 			.await?
-// 			.context("Should have user 'demo1'")?;
+        // -- Exec
+        let user = UserInfoBmc::first_by_username::<UserInfoForAuth>(&ctx, &mm, fx_username)
+            .await?
+            .ok_or("Should have user 'demo1'")?;
 
-// 		// -- Check
-// 		assert_eq!(user.username, fx_username);
+        // -- Check
+        assert_eq!(user.username, fx_username);
 
-// 		Ok(())
-//     }
-// }
-// // endregion: --- Tests
+        Ok(())
+    }
+}
+// endregion: --- Tests

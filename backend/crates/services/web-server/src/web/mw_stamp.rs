@@ -12,7 +12,7 @@ use tower_cookies::cookie::time::OffsetDateTime;
 use tracing::debug;
 use uuid::Uuid;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ReqStamp {
     pub uuid: Uuid,
     pub time_in: OffsetDateTime,
@@ -42,13 +42,11 @@ impl<S: Send + Sync> FromRequestParts<S> for ReqStamp {
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
         debug!("{:<12} - ReqStamp", "EXTRACTOR");
 
-        let part = parts
+        parts
             .extensions
             .get::<ReqStamp>()
-            .clone()
-            .ok_or(Error::ReqStampNotInResponseExt);
-
-        part.cloned()
+            .cloned()
+            .ok_or(Error::ReqStampNotInResponseExt)
     }
 }
 // endregion: --- ReqStamp Extractor

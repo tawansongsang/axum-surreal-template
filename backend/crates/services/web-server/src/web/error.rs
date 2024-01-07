@@ -30,15 +30,6 @@ pub enum Error {
     // -- ReqStamp
     ReqStampNotInResponseExt,
 
-    // -- Rpc
-    RpcMethodUnknow(String),
-    RpcMissingParams {
-        rpc_method: String,
-    },
-    RpcFailJsonParams {
-        rpc_method: String,
-    },
-
     // -- Module
     #[from]
     Model(model::Error),
@@ -57,7 +48,7 @@ pub enum Error {
 // region:    --- Axum IntoResponse
 impl IntoResponse for Error {
     fn into_response(self) -> axum::response::Response {
-        debug!("{:<12} - model::Error {self:?}", "INTO_RES");
+        debug!("{:<12} - web::Error {self:?}", "INTO_RES");
 
         // -- Create a placeholder Axum response.
         let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
@@ -84,7 +75,7 @@ impl Error {
     pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
         use web::Error::*;
 
-        let response = match self {
+        match self {
             // -- Login
             LoginFailUsernameNotFound
             | LoginFailUserHasNoPwd { .. }
@@ -93,25 +84,23 @@ impl Error {
             // -- Auth
             CtxExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
-            // -- Model TODO: implement for better client response.
             Model(model::Error::EntityNotFound { entity, id }) => (
                 StatusCode::BAD_REQUEST,
                 ClientError::ENTITY_NOT_FOUND { entity, id: *id },
             ),
 
-            // // -- Rpc TODO: implement for better client response.
-            // RpcMissingParams { .. } | RpcFailJsonParams { .. } | RpcMethodUnknow(_) => {
-            //     (StatusCode::BAD_REQUEST, ClientError::BAD_REQUEST)
-            // }
+            // -- Rpc
+            Rpc(lib_rpc::Error::SerdeJson(detail)) => (
+                StatusCode::BAD_REQUEST,
+                ClientError::BAD_REQUEST(detail.to_string()),
+            ),
 
             // -- Fallback,
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ClientError::SERVICE_ERROR,
             ),
-        };
-
-        response
+        }
     }
 }
 
@@ -123,7 +112,7 @@ pub enum ClientError {
     LOGIN_FAIL,
     NO_AUTH,
     ENTITY_NOT_FOUND { entity: &'static str, id: i64 },
-    // ENTITY_NOT_FOUND,
+    BAD_REQUEST(String),
     SERVICE_ERROR,
 }
 // endregion: --- Client Error

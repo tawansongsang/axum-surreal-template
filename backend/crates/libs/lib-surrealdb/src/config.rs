@@ -5,9 +5,8 @@ pub fn core_config() -> &'static CoreConfig {
     static INSTANCE: OnceLock<CoreConfig> = OnceLock::new();
 
     INSTANCE.get_or_init(|| {
-        CoreConfig::load_from_env().unwrap_or_else(|ex| {
-            panic!("FATEL - WHILE LOADING CONF - Cause: {ex:?}")
-        })
+        CoreConfig::load_from_env()
+            .unwrap_or_else(|ex| panic!("FATEL - WHILE LOADING CONF - Cause: {ex:?}"))
     })
 }
 
@@ -22,9 +21,6 @@ pub struct CoreConfig {
     pub DB_USERNAME: String,
     pub DB_PASSWORD: String,
     // pub AUTHGODTOKEN: String,
-
-    // -- Web
-    // pub WEB_FOLDER: String,
 }
 
 impl CoreConfig {
@@ -41,8 +37,6 @@ impl CoreConfig {
             DB_PASSWORD: get_env("SURREALDB_PASSWORD")?,
             // // -- AuthGodToken
             // AUTHGODTOKEN: get_env("AUTHGODTOKEN")?,
-            // -- Web
-            // WEB_FOLDER: get_env("WEB_FOLDER")?,
         })
     }
 }

@@ -33,13 +33,6 @@ pub struct UserInfoCreated<'a> {
     pub update_by: &'a Option<sql::Thing>,
 }
 
-// #[derive(Debug, Deserialize)]
-// pub struct UserInfoForUpdatePWD {
-//     pub id: sql::Thing,
-//     pub password: String,
-//     pub update_by: sql::Thing,
-// }
-
 #[derive(Debug, Deserialize)]
 pub struct UserInfoForLogin {
     pub id: sql::Thing,
@@ -59,10 +52,6 @@ pub struct UserInfoForAuth {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct UserInfoForTest {
+pub struct UserInfoRecord {
     pub id: sql::Thing,
-    pub username: String,
-    pub password: Option<String>,
-    pub password_salt: Uuid,
-    pub token_salt: Uuid,
 }

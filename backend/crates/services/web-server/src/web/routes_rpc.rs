@@ -1,15 +1,16 @@
-use super::{mw_auth::CtxW, Error, Result};
+use std::sync::Arc;
+
+use super::mw_auth::CtxW;
 use axum::{
     extract::State,
     response::{IntoResponse, Response},
     routing::post,
     Json, Router,
 };
-use lib_rpc::rpcs::task_rpc::{create_task, delete_task, list_tasks, update_task};
-use lib_surrealdb::{ctx::Ctx, model::ModelManager};
-use serde::Deserialize;
-use serde_json::{from_value, json, to_value, Value};
-use tracing::debug;
+use lib_rpc::{router::RpcRouter, task_rpc, RpcRequest, RpcResources};
+use lib_surrealdb::model::ModelManager;
+
+use serde_json::{json, Value};
 
 #[derive(Clone)]
 pub struct RpcState {
@@ -22,83 +23,53 @@ pub struct RpcInfo {
     pub method: String,
 }
 
-/// JSON-RPC Request Body.
-#[derive(Deserialize)]
-struct RpcRequest {
-    // jsonrpc: String, MUST be exactly "2",
-    id: Option<Value>,
-    method: String,
-    params: Option<Value>,
-}
-
 // Axum router for '/api/rpc'
 pub fn routes(rpc_state: RpcState) -> Router {
-    // -- Builder the combined RpcRouter.
-    // let rpc_router = RpcRouter::new()
-    //     .extend(task_rpc::rpc_router());
+    // Build the combined RpcRouter
+    let rpc_router = RpcRouter::new().extend(task_rpc::rpc_router());
+
+    // Build the Axum Router for '/rpc'
     Router::new()
-        .route("/rpc", post(rpc_handler))
-        .with_state(rpc_state)
+        .route("/rpc", post(rpc_axum_handler))
+        .with_state((rpc_state, Arc::new(rpc_router)))
 }
 
-async fn rpc_handler(
-    State(rpc_state): State<RpcState>,
+async fn rpc_axum_handler(
+    State((rpc_state, rpc_router)): State<(RpcState, Arc<RpcRouter>)>,
     ctx: CtxW,
     Json(rpc_req): Json<RpcRequest>,
 ) -> Response {
     let ctx = ctx.0;
-    inner_rpc_handler(ctx, rpc_state.mm, rpc_req)
-        .await
-        .into_response()
-}
 
-macro_rules! exec_rpc_fn {
-    // -- With Params
-    ($rpc_fn:expr, $ctx:expr, $mm:expr, $rpc_params:expr) => {{
-        let rpc_fn_name = stringify!($rpc_fn);
-        let params = $rpc_params.ok_or(Error::RpcMissingParams {
-            rpc_method: rpc_fn_name.to_string(),
-        })?;
-
-        let params = from_value(params).map_err(|_| Error::RpcFailJsonParams {
-            rpc_method: rpc_fn_name.to_string(),
-        })?;
-        $rpc_fn($ctx, $mm, params).await.map(to_value)??
-    }};
-
-    // -- Without Params
-    ($rpc_fn:expr, $ctx:expr, $mm:expr) => {
-        $rpc_fn($ctx, $mm).await.map(to_value)??
+    // -- Create the RPC Info
+    //    (will be set to the response.extensions)
+    let rpc_info = RpcInfo {
+        id: rpc_req.id.clone(),
+        method: rpc_req.method.clone(),
     };
-}
-
-async fn inner_rpc_handler(ctx: Ctx, mm: ModelManager, rpc_req: RpcRequest) -> Result<Json<Value>> {
-    let RpcRequest {
-        id: rpc_id,
-        method: rpc_method,
-        params: rpc_params,
-    } = rpc_req;
-
-    debug!(
-        "{:<12} - inner_rpc_handler - method: {rpc_method}",
-        "HANDLER"
-    );
-
-    let result_json = match rpc_method.as_str() {
-        // -- Task RPC methods.
-        "create_task" => exec_rpc_fn!(create_task, ctx, mm, rpc_params),
-        "list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
-        "update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
-        "delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
-
-        // -- Fallback as Err.
-        _ => return Err(Error::RpcMethodUnknow(rpc_method)),
+    let rpc_method = &rpc_info.method;
+    let rpc_params = rpc_req.params;
+    let rpc_resources = RpcResources {
+        ctx: Some(ctx),
+        mm: rpc_state.mm,
     };
 
-    let body_response = json!({
-        "id": rpc_id,
-        "result": result_json,
+    // -- Exec Rpc Route
+    let res = rpc_router.call(rpc_method, rpc_resources, rpc_params).await;
+
+    // -- Build Rpc Success Response
+    let res = res.map(|v| {
+        let body_response = json!({
+            "id": rpc_info.id,
+            "result": v,
+        });
+        Json(body_response)
     });
 
-    Ok(Json(body_response))
+    // -- Create and Update Axum Response
+    let res: crate::web::Result<_> = res.map_err(crate::web::Error::from);
+    let mut res = res.into_response();
+    res.extensions_mut().insert(Arc::new(rpc_info));
+
+    res
 }

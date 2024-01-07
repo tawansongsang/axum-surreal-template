@@ -1,0 +1,27 @@
+
+@host = localhost
+@port = 8080
+
+###
+POST http://{{host}}:{{port}}/api/rpc HTTP/1.1
+content-type: application/json
+
+{
+    "id": "1",
+    "method": "list_tasks",
+    "params": {
+        "filters": [],
+        "list_options": {
+            "start": 1,
+            "limit": 50,
+            "orderby": [
+                {
+                    "field": "create_on",
+                    "is_desc": true,
+                }
+            ]
+        },
+    }
+}
+
+###

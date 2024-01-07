@@ -1,7 +1,7 @@
 use lib_surrealdb::{
     ctx::Ctx,
     model::{
-        task::{bmc::TaskBmc, Task, TaskParamsForCreate, TaskParamsForUpdate},
+        task::{bmc::TaskBmc, Task, TaskFilter, TaskParamsForCreate, TaskParamsForUpdate},
         ModelManager,
     },
 };
@@ -9,7 +9,7 @@ use lib_surrealdb::{
 use crate::{
     params::{ParamsForCreate, ParamsForUpdate, ParamsIded},
     router::RpcRouter,
-    rpc_router, Result,
+    rpc_router, ParamsList, Result,
 };
 
 pub fn rpc_router() -> RpcRouter {
@@ -35,10 +35,12 @@ pub async fn create_task<'a>(
     Ok(task)
 }
 
-pub async fn list_tasks<'a>(ctx: Ctx, mm: ModelManager) -> Result<Vec<Task<'a>>> {
-    // TODO: create TaskFilter
-    // let tasks = TaskBmc::list(&ctx, &mm, filter, limit)?;
-    let tasks = TaskBmc::list(&ctx, &mm).await?;
+pub async fn list_tasks<'a>(
+    ctx: Ctx,
+    mm: ModelManager,
+    params: ParamsList<TaskFilter>,
+) -> Result<Vec<Task<'a>>> {
+    let tasks = TaskBmc::list(&ctx, &mm, params.filters, params.list_options).await?;
 
     Ok(tasks)
 }

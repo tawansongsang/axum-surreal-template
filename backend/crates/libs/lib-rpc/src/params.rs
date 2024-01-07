@@ -9,6 +9,7 @@
 
 use crate::router::{IntoDefaultParams, IntoParams};
 use crate::Result;
+use lib_surrealdb::model::ListOptions;
 
 use serde::{de::DeserializeOwned, Deserialize};
 use serde_json::Value;
@@ -46,17 +47,11 @@ where
     F: DeserializeOwned,
 {
     #[serde_as(deserialize_as = "Option<OneOrMany<_>>")]
-    pub filers: Option<Vec<F>>,
-    pub list_options: Option<ListOptions>, // ListOptions from modql TODO: understand modql and implement with owned.
+    pub filters: Option<Vec<F>>,
+    pub list_options: Option<ListOptions>,
 }
 
 impl<D> IntoDefaultParams for ParamsList<D> where D: DeserializeOwned + Send + Default {}
-
-// TODO: Understand modq and impement with owned.
-#[derive(Deserialize)]
-pub struct ListOptions {
-    pub username: String,
-}
 
 // region:    --- General Implementations
 

@@ -1,11 +1,10 @@
 use crate::{
     ctx::Ctx,
-    model::{task::TaskRecord, Error, ModelManager, Result},
+    model::{conditions, task::TaskRecord, Error, ListOptions, ModelManager, Result},
 };
 
-use tracing::debug;
+use super::{Task, TaskFilter, TaskForCreate, TaskParamsForCreate, TaskParamsForUpdate};
 
-use super::{Task, TaskForCreate, TaskParamsForCreate, TaskParamsForUpdate};
 pub struct TaskBmc;
 
 impl TaskBmc {
@@ -42,27 +41,18 @@ impl TaskBmc {
     pub async fn list<'a>(
         _ctx: &Ctx,
         mm: &ModelManager,
-        // filter: &'a str,
-        // list_options: &'a str,
+        filters: Option<Vec<TaskFilter>>,
+        list_options: Option<ListOptions>,
     ) -> Result<Vec<Task<'a>>> {
         let db = mm.db();
-        // TODO: Create function for query builder;
-        // let sql = "
-        //     SELECT * FROM task
-        //     WHERE id=$id AND string::contains($title)
-        //             AND done AND create_by = $create_by
-        //             AND update_by = $update_by
-        //             AND start_create_on = $start_create_on
-        //             AND start_update_on = $start_update_on
-        //     ORDER BY $order_bys
-        //     LIMIT $limit START $offset
-        // ";
 
-        // let mut result = db.query(sql).bind(("title", "test")).await?;
+        let conditions = conditions::gen_all_condition(filters, list_options);
 
-        // let task: Vec<Task<'a>> = result.take(0)?;
+        let sql = format!("SELECT * FROM task {}", conditions);
 
-        let tasks: Vec<Task> = db.select("task").await?;
+        let mut response = db.query(sql).await?;
+
+        let tasks = response.take::<Vec<Task>>(0)?;
 
         Ok(tasks)
     }
@@ -78,14 +68,14 @@ impl TaskBmc {
         let user_id = ctx.user_id_thing().ok_or(Error::UserIdNotFound)?;
         let title = task_u.title.as_deref().unwrap_or(&task.title);
 
-        let query = r#"UPDATE type::thing($table, $id) MERGE { 
+        let sql = r#"UPDATE type::thing($table, $id) MERGE { 
             title: $title, 
             update_by: $update_by, 
             update_on: time::now(), 
         };"#;
 
         let mut response = db
-            .query(query)
+            .query(sql)
             .bind(("table", "task"))
             .bind(("id", task_id))
             .bind(("title", title))
@@ -110,4 +100,41 @@ impl TaskBmc {
     }
 }
 
-// TODO: Create Unit Test
+// TODO: Create Unit for multi create and delete all and list task Test
+// region:    --- Tests
+#[cfg(test)]
+mod tests {
+    pub type Result<T> = core::result::Result<T, Error>;
+    pub type Error = Box<dyn std::error::Error>; // For tests.
+
+    use crate::model;
+
+    use super::*;
+    use serial_test::serial;
+
+    #[serial]
+    #[tokio::test]
+    async fn test_create_delete_first_task_ok() -> Result<()> {
+        // -- Setup & Fixtures
+        let mm = model::ModelManager::new().await?;
+        let ctx = Ctx::new(Some("user_info:iR1f8i7Wg7jipR3uhDhJ".to_string())).unwrap();
+        let fx_task_for_create = TaskParamsForCreate {
+            title: "Task Test OK".to_string(),
+        };
+
+        // -- Exec
+        let task_id = TaskBmc::create(&ctx, &mm, fx_task_for_create)
+            .await
+            .unwrap()
+            .id
+            .to_raw();
+
+        let deleted = TaskBmc::delete(&ctx, &mm, &task_id).await.unwrap();
+
+        // -- Check
+        assert_eq!(deleted, ());
+
+        Ok(())
+    }
+}
+// endregion: --- Tests

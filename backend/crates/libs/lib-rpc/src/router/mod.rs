@@ -37,10 +37,12 @@ pub use rpc_handler_wrapper::{RpcHandlerWrapper, RpcHandlerWrapperTrait};
 
 use crate::RpcResources;
 use crate::{Error, Result};
+use serde::Deserialize;
 use serde_json::Value;
 use std::{collections::HashMap, future::Future, pin::Pin};
 
 /// The raw JSON-RPC request object, serving as the foundation for RPC routing.
+#[derive(Deserialize)]
 pub struct RpcRequest {
     // jsonrpc: String, MUST be exactly "2",
     pub id: Option<Value>,
