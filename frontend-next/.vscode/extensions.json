@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "alefragnani.bookmarks",
+        "christian-kohler.path-intellisense",
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint"
+    ]
+}
