@@ -127,6 +127,7 @@ mod tests {
             .await
             .unwrap()
             .id
+            .id
             .to_raw();
 
         let deleted = TaskBmc::delete(&ctx, &mm, &task_id).await.unwrap();
