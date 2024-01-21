@@ -6,7 +6,7 @@ use axum::{extract::State, routing::post, Json, Router};
 use lib_surrealdb::{
     ctx::Ctx,
     model::{
-        user_info::{bmc::UserInfoBmc, UserInfoForLogin},
+        user_info::{bmc::UserInfoBmc, UserInfoForCreate, UserInfoForLogin},
         ModelManager,
     },
 };
@@ -19,6 +19,7 @@ pub fn routes(mm: ModelManager) -> Router {
     Router::new()
         .route("/api/login", post(api_login_handler))
         .route("/api/logout", post(api_logout_handler))
+        .route("/api/register", post(api_register_handler))
         .with_state(mm)
 }
 
@@ -99,3 +100,41 @@ struct LogoutPayload {
     logout: bool,
 }
 // endregion: --- Logout
+
+async fn api_register_handler(
+    State(mm): State<ModelManager>,
+    _cookies: Cookies,
+    Json(payload): Json<RegisterPayload>,
+) -> Result<Json<Value>> {
+    debug!("{:<12} - api_register_handler", "HANLDER");
+    let root_ctx = Ctx::root_ctx();
+
+    let RegisterPayload {
+        username,
+        name,
+        password,
+    } = payload;
+
+    let user_info_for_create = UserInfoForCreate {
+        username,
+        name,
+        password,
+    };
+
+    let _user_info_record = UserInfoBmc::create(&root_ctx, &mm, user_info_for_create).await?;
+
+    let body = Json(json!({
+        "result": {
+            "success": true
+        }
+    }));
+
+    Ok(body)
+}
+
+#[derive(Debug, Deserialize)]
+struct RegisterPayload {
+    username: String,
+    name: String,
+    password: String,
+}

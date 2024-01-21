@@ -89,6 +89,16 @@ impl Error {
                 ClientError::ENTITY_NOT_FOUND { entity, id: *id },
             ),
 
+            Model(model::Error::UsernameAlreadyExists) => (
+                StatusCode::BAD_REQUEST,
+                ClientError::USERNAME_ALREADY_EXISTS,
+            ),
+
+            Model(model::Error::UsernameNotValidFormat) => (
+                StatusCode::BAD_REQUEST,
+                ClientError::USERNAME_NOT_VALID_FORMAT,
+            ),
+
             // -- Rpc
             Rpc(lib_rpc::Error::SerdeJson(detail)) => (
                 StatusCode::BAD_REQUEST,
@@ -111,6 +121,8 @@ impl Error {
 pub enum ClientError {
     LOGIN_FAIL,
     NO_AUTH,
+    USERNAME_ALREADY_EXISTS,
+    USERNAME_NOT_VALID_FORMAT,
     ENTITY_NOT_FOUND { entity: &'static str, id: i64 },
     BAD_REQUEST(String),
     SERVICE_ERROR,

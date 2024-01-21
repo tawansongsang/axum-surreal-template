@@ -80,12 +80,30 @@ impl UserInfoBmc {
         mm: &ModelManager,
         user_info_for_create: UserInfoForCreate,
     ) -> Result<UserInfoRecord> {
+        // Verify Username in DB
+        let user_info = UserInfoBmc::first_by_username::<UserInfoRecord>(
+            &ctx,
+            mm,
+            &user_info_for_create.username,
+        )
+        .await?;
+        if let Some(_) = user_info {
+            return Err(Error::UsernameAlreadyExists);
+        }
+        let validate_username =
+            UserInfoBmc::validate_username(mm, &user_info_for_create.username).await?;
+        if !validate_username {
+            return Err(Error::UsernameNotValidFormat);
+        }
+
         let db = mm.db();
 
         let user_id_create = ctx.user_id_thing();
 
         let user_info_created = UserInfoCreated {
-            username: user_info_for_create.username,
+            username: &user_info_for_create.username,
+            email: &user_info_for_create.username,
+            name: user_info_for_create.name,
             password: user_info_for_create.password,
             create_by: &user_id_create,
             update_by: &user_id_create,
@@ -113,6 +131,18 @@ impl UserInfoBmc {
         result
             .take::<Option<bool>>(0)?
             .ok_or(Error::CannotComparePasswordFromDB)
+    }
+
+    pub async fn validate_username(mm: &ModelManager, username: &str) -> Result<bool> {
+        let db = mm.db();
+
+        let sql = "RETURN string::is::email($username);";
+
+        let mut result = db.query(sql).bind(("username", username)).await?;
+
+        result
+            .take::<Option<bool>>(0)?
+            .ok_or(Error::CannotValidateUsernameFromDB)
     }
 }
 

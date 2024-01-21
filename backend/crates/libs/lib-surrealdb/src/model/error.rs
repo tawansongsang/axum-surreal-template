@@ -18,6 +18,7 @@ pub enum Error {
     },
 
     CannotComparePasswordFromDB,
+    CannotValidateUsernameFromDB,
     CannotParseStrToDatetime(String),
     CannotParseStrToThing(String),
     DataNotFound,
@@ -25,6 +26,8 @@ pub enum Error {
     DataNotFoundFromDelete,
     DataNotFoundFromUpdate,
     UserIdNotFound,
+    UsernameAlreadyExists,
+    UsernameNotValidFormat,
 
     // -- Modules
     // #[from]

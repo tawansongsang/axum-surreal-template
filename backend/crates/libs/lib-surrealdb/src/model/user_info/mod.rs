@@ -8,6 +8,9 @@ use uuid::Uuid;
 pub struct UserInfo {
     pub id: sql::Thing,
     pub username: String,
+    pub email: String,
+    pub email_verified: sql::Datetime,
+    pub name: String,
 
     // -- pwd and token info
     pub password: String,
@@ -22,12 +25,18 @@ pub struct UserInfo {
 #[derive(Debug, Serialize)]
 pub struct UserInfoForCreate {
     pub username: String,
+    // pub email: String,
+    // pub email_verified: sql::Datetime,
+    pub name: String,
     pub password: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct UserInfoCreated<'a> {
-    pub username: String,
+    pub username: &'a str,
+    pub email: &'a str,
+    // pub email_verified: sql::Datetime,
+    pub name: String,
     pub password: String,
     pub create_by: &'a Option<sql::Thing>,
     pub update_by: &'a Option<sql::Thing>,

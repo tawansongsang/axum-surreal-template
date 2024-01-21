@@ -10,7 +10,7 @@ async fn main() -> Result<()> {
     let req_login = hc.do_post(
         "/api/login",
         json!({
-            "username": "demo1",
+            "username": "demo1@demo.com",
             "password": "demo1",
         }),
     );
@@ -134,7 +134,7 @@ async fn main() -> Result<()> {
         }),
     );
     let res = req_list_tasks.await?;
-    res.print().await?;
+    // res.print().await?;
 
     for task_id in task_ids {
         let req_delete_task = hc.do_post(
@@ -159,7 +159,18 @@ async fn main() -> Result<()> {
         }),
     );
     let res = req_logout.await?;
-    // res.print().await?;
+    res.print().await?;
+
+    let req_register = hc.do_post(
+        "/api/register",
+        json!({
+            "username": "demo2@demo.com",
+            "name": "demo2",
+            "password": "demo2",
+        }),
+    );
+    let res = req_register.await?;
+    res.print().await?;
 
     Ok(())
 }
