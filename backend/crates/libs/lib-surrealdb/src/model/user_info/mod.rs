@@ -46,9 +46,11 @@ pub struct UserInfoCreated<'a> {
 pub struct UserInfoForLogin {
     pub id: sql::Thing,
     pub username: String,
+    pub name: String,
     pub password: Option<String>, // encrypted, #_scheme_id_#....
     pub password_salt: Uuid,
     pub token_salt: Uuid,
+    pub role: String,
 }
 
 #[derive(Debug, Deserialize)]
