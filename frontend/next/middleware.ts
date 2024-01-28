@@ -11,27 +11,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 const { auth } = NextAuth(authConfig);
 
-// export function middleware(request: NextRequest) {
-// 	// console.log({ Request: request });
-// 	const response = NextResponse.next();
-// 	// console.log({ Response: response });
-// 	const authMiddleware = auth((request) => {
-// 		const { nextUrl } = request;
-// 		const isLoggedIn = !!request.auth;
-// 		console.log({ NextUrl: nextUrl });
-// 		console.log({ IsLoggedIn: isLoggedIn });
-// 		return null;
-// 	})
-
-
-// 	return response;
-// }
-
 export default auth((req) => {
-	console.log("");
 	// console.log({ NextAuthRequest: req })
 	const { nextUrl } = req;
 	const isLoggedIn = !!req.auth;
+	// console.log({ ReqAuthUser: req.auth.user });
 
 	const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
 	const isPublicRoute = publicRoutes.includes(nextUrl.pathname);

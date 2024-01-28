@@ -7,7 +7,6 @@ export default {
 	providers: [
 		Credentials({
 			async authorize(credentials) {
-				// console.log("auth.config.ts");
 				const validatedFields = LoginSchema.safeParse(credentials);
 
 				if (validatedFields.success) {
@@ -24,15 +23,10 @@ export default {
 
 					const status = response.status;
 					const cookies = response.headers.getSetCookie();
-					// TODO: setting addtional cookies to client
-					// console.log(cookies);
 					const backend_cookies = cookies[0].split(";")[0];
-					// console.log(backend_cookies);
 					const response_json = await response.json();
-					// console.log(response_json);
 					const user = response_json.data;
 					user["auth_token"] = backend_cookies;
-					// console.log(user);
 					if (status === 200) return user;
 				}
 
