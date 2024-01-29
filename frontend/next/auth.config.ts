@@ -1,10 +1,20 @@
-import type { NextAuthConfig } from "next-auth"
-import Credentials from "next-auth/providers/credentials"
+import type { NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import Github from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 
 import { LoginSchema } from "@/schemas";
 
 export default {
 	providers: [
+		Google({ // TODO: add user to backend
+			clientId: process.env.GOOGLE_CLIENT_ID,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRETE,
+		}),
+		Github({
+			clientId: process.env.GITHUB_CLIENT_ID,
+			clientSecret: process.env.GITHUB_CLIENT_SECRET,
+		}),
 		Credentials({
 			async authorize(credentials) {
 				const validatedFields = LoginSchema.safeParse(credentials);
@@ -12,7 +22,7 @@ export default {
 				if (validatedFields.success) {
 					const { email, password } = validatedFields.data;
 					const body = { username: email, password: password };
-					const response = await fetch("http://localhost:8080/api/login", {
+					const response = await fetch(`${process.env.BACKEND_URL}/login`, {
 						method: "POST",
 						cache: "no-cache",
 						headers: {
