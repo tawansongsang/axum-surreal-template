@@ -12,5 +12,5 @@ members = [
     "crates/libs/lib-surrealdb", # e.g., model, ctx, config.
 
     # -- Application Services
-    "crates/services/web-server",
+    "crates/services/web-server", "crates/libs/lib-sqlserver",
 ]
