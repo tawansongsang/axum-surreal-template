@@ -1,6 +1,8 @@
 mod error;
 mod store;
 
+use tracing::log::info;
+
 pub use self::error::{Error, Result};
 
 use self::store::{new_db_pool, Db};
@@ -22,5 +24,33 @@ impl ModelManager {
         &self.db
     }
 
-    // TODO: create test_connection
+    pub async fn test_connection(&self) {
+        info!(
+            "{:<12} - test_connection - {}",
+            "STARTUP", "trying to use pool for connecting to sql server"
+        );
+
+        let mut client = self.db().get().await.unwrap();
+
+        let stream = client
+            .simple_query("SELECT * FROM @@VERSION;")
+            .await
+            .unwrap();
+
+        let result = stream
+            .into_first_result()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|row| {
+                let val: &str = row.get(0).unwrap();
+                String::from(val)
+            })
+            .collect::<Vec<_>>();
+
+        info!(
+            "{:<12} - test_connection {}: \n{:?}",
+            "STARTUP", "Sql Server Version: ", result
+        );
+    }
 }

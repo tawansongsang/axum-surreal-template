@@ -1,3 +1,4 @@
 # TODO List
-- [x] refectoring route_rpc with lib/lib-rpc for scaling code
-- [ ] create rpc 'project'
+- [x] refectoring route_rpc with libs/lib-rpc for scaling code
+- [x] create rpc 'project'
+- [x] adding libs/lib-sqlserver for connecting sql server database
