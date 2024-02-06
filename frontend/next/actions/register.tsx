@@ -13,7 +13,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   }
 
   const { email, password, name } = validatedFields.data;
-  const response = await fetch("http://localhost:8080/api/register", {
+  const response = await fetch(`${process.env.BACKEND_URL}/api/register`, {
     method: "POST",
     cache: "no-cache",
     body: JSON.stringify({

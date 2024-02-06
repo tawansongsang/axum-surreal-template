@@ -25,8 +25,8 @@ export const {
 			if (!token.sub) return token;
 			if (!user && !account) return token;
 
-			token["auth_token"] = user.auth_token;
-			token["role"] = user.role;
+			token.auth_token = user.auth_token;
+			token.role = user.role;
 			return token;
 		},
 		async session({ session, token }: { session: Session; token?: JWT }) {

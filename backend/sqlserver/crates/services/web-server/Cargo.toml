@@ -1,0 +1,28 @@
+[package]
+name = "web-server"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lib-auth = { version = "0.1.0", path = "../../libs/lib-auth" }
+lib-rpc = { version = "0.1.0", path = "../../libs/lib-rpc" }
+lib-sqlserver = { version = "0.1.0", path = "../../libs/lib-sqlserver" }
+lib-utils = { version = "0.1.0", path = "../../libs/lib-utils" }
+axum = "0.7.3"
+tokio = { version = "1.35.1", features = ["full"] }
+tower-cookies = "0.10.0"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+uuid = "1.6.1"
+serde_with = "3.4.0"
+derive_more = "0.99.17"
+async-trait = "0.1.76"
+serde = "1.0.193"
+serde_json = "1.0.108"
+strum_macros = "0.25.3"
+tower-http = { version = "0.5.0", features = ["fs"] }
+
+[dev-dependencies]
+httpc-test = "0.1.8"

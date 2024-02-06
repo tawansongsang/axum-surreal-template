@@ -1,0 +1,24 @@
+[package]
+name = "lib-sqlserver"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bb8 = "0.8.2"
+bb8-tiberius = "0.15.0"
+derive_more = { version = "0.99.17", features = ["from"] }
+lib-utils = { version = "0.1.0", path = "../../libs/lib-utils" }
+serde = { version = "1.0.196", features = ["derive"] }
+serde_with = "3.5.1"
+tiberius = { version = "0.12.2", features = ["tokio"] }
+tracing = "0.1.40"
+uuid = "1.7.0"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+serial_test = "3.0.0"
+tokio = { version = "1.36.0", features = ["full"] }

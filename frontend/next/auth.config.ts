@@ -36,7 +36,7 @@ export default {
 					const backend_cookies = cookies[0].split(";")[0];
 					const response_json = await response.json();
 					const user = response_json.data;
-					user["auth_token"] = backend_cookies;
+					user.auth_token = backend_cookies;
 					if (status === 200) return user;
 				}
 
