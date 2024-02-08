@@ -1,0 +1,34 @@
+volumes:
+  db:
+  # log:
+services:
+  # server:
+  #   build:
+  #     context: .
+  #     target: final
+  #   environment:
+  #     - MSSQL_HOST=db
+  #     - MSSQL_USERNAME=sa
+  #     - MSSQL_PASSWORD=F5z0f7HXVtR5
+  #     - MSSQL_DBNAME=QrShortUrl
+  #     - ESERVICE_URL=https://ipcs-core.ipthailand.go.th/api/oauth/external/userinfo
+  #   ports:
+  #     - 8080:80
+  #   networks:
+  #     - qrcode-next_nextjs
+  #   depends_on:
+  #     - db
+  db:
+    # image: mcr.microsoft.com/mssql/server:2022-preview-ubuntu-22.04
+    # image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    user: root
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=F5z0f7HXVtR5
+    ports:
+      - 1433:1433
+    volumes:
+      - db:/var/opt/mssql
+      # - log:/vat/opt/mssql/log
