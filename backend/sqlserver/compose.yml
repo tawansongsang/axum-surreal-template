@@ -10,8 +10,7 @@ services:
   #     - MSSQL_HOST=db
   #     - MSSQL_USERNAME=sa
   #     - MSSQL_PASSWORD=F5z0f7HXVtR5
-  #     - MSSQL_DBNAME=QrShortUrl
-  #     - ESERVICE_URL=https://ipcs-core.ipthailand.go.th/api/oauth/external/userinfo
+  #     - MSSQL_DBNAME=DbTemplate
   #   ports:
   #     - 8080:80
   #   networks:
