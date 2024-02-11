@@ -25,7 +25,7 @@ async fn main() {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    info!("Starting Connection to SurrealDB");
+    info!("Starting Connection to Sql Server");
 
     // -- Initialize ModelManager.
     let mm = ModelManager::new().await.unwrap();
