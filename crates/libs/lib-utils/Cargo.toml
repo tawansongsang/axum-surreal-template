@@ -1,0 +1,18 @@
+[package]
+name = "lib-utils"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+doctest = false
+
+[dependencies]
+base64 = "0.21.5"
+derive_more = "0.99.17"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_with = "3.4.0"
+time = { version = "0.3.31", features = ["formatting", "parsing"] }
+
+[lints]
+workspace = true

@@ -1,9 +1,10 @@
 {
     "recommendations": [
+        "serayuzgur.crates",
+        "rust-lang.rust-analyzer",
         "tamasfe.even-better-toml",
-        "christian-kohler.path-intellisense",
-        "dustypomerleau.rust-syntax",
         "wayou.vscode-todo-highlight",
-        "serayuzgur.crates"
+        "alefragnani.bookmarks",
+        "christian-kohler.path-intellisense"
     ]
 }

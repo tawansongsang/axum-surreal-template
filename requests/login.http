@@ -1,0 +1,19 @@
+@host = localhost
+@port = 8080
+
+###
+POST http://{{host}}:{{port}}/api/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "demo1@demo.com",
+    "password": "demo1"
+}
+
+###
+POST http://{{host}}:{{port}}/api/logout HTTP/1.1
+content-type: application/json
+
+{
+    "logout": true
+}

@@ -1,0 +1,17 @@
+[env]
+RUST_LOG = "debug"
+SURREALDB_HOST = "127.0.0.1"
+SURREALDB_PORT = "8000"
+SURREALDB_NAMESPACE = "ns_template"
+SURREALDB_DBNAME = "db_template"
+SURREALDB_USERNAME = "root"
+SURREALDB_PASSWORD = "root"
+SERVICE_PWD_KEY = "CKUGFOD9_2Qf6Pn3ZFRYgPYb8ht4vKqEG9PGMXTB7497bT0367DjoaD6ydFnEVaIRda0kKeBZVCT5Hb62m2sCA"
+SERVICE_TOKEN_KEY = "9FoHBmkyxbgu_xFoQK7e0jz3RMNVJWgfvbVn712FBNH9LLaAWS3CS6Zpcg6RveiObvCUb6a2z-uAiLjhLh2igw"
+SERVICE_TOKEN_DURATION_SEC = "1800"                                                                          # 30 minites
+SERVICE_WEB_FOLDER = "web-folder/"
+MSSQL_HOST = "127.0.0.1"
+MSSQL_PORT = "1433"
+MSSQL_DBNAME = "db_template"
+MSSQL_USERNAME = "sa"
+MSSQL_PASSWORD = "password"

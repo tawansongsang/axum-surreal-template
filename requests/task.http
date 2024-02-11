@@ -1,0 +1,73 @@
+
+@host = localhost
+@port = 8080
+
+
+###
+
+POST http://{{host}}:{{port}}/api/rpc HTTP/1.1
+content-type: application/json
+
+{
+    "id": "1",
+    "method": "create_task",
+    "params": {
+        "data": {
+            "title": "task from request http 1"
+        }
+    }
+}
+
+###
+POST http://{{host}}:{{port}}/api/rpc HTTP/1.1
+content-type: application/json
+
+{
+    "id": "1",
+    "method": "list_tasks",
+    "params": {
+        "filters": [
+            {
+                "id": "task:8c4c7g33um9xsqpyxmqx"
+            }
+        ],
+        "list_options": {
+            "start": 0,
+            "limit": 50,
+            "orderby": [
+                {
+                    "field": "create_on",
+                    "is_desc": true
+                }
+            ]
+        }
+    }
+}
+###
+POST http://{{host}}:{{port}}/api/rpc HTTP/1.1
+content-type: application/json
+
+{
+    "id": "1",
+    "method": "update_task",
+    "params": {
+        "id": "bw7g5oqftf3kgosgsio3",
+        "data": {
+            "title": "task from request http 1 updated"
+        }
+    }
+}
+
+###
+POST http://{{host}}:{{port}}/api/rpc HTTP/1.1
+content-type: application/json
+
+{
+    "id": "1",
+    "method": "delete_task",
+    "params": {
+        "id": "bw7g5oqftf3kgosgsio3"
+    }
+}
+
+
