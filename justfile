@@ -7,6 +7,7 @@ alias btdb := backend_test_surrealdb
 alias btr := backend_test_rpc
 alias btd := backend_test_derive
 alias si := surreal_import
+alias ss := surreal_sql
 
 backend_build:
   cargo build 
@@ -34,3 +35,6 @@ backend_test_derive:
   
 surreal_import PATH:
   surreal import --conn http://localhost:8000 --user root --pass root --ns ns_tempalte --db db_template {{PATH}}
+
+surreal_sql:
+  surreal sql --endpoint http://localhost:8000 --username root --password root --namespace ns_template --database db_template --pretty
