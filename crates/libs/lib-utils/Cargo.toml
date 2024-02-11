@@ -12,7 +12,7 @@ base64 = "0.21.5"
 derive_more = "0.99.17"
 serde = { version = "1.0.193", features = ["derive"] }
 serde_with = "3.4.0"
-time = { version = "0.3.31", features = ["formatting", "parsing"] }
+time = { version = "0.3.31", features = ["formatting", "parsing", "macros"] }
 
 [lints]
 workspace = true
